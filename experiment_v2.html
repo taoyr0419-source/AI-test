@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Creativity & AI Assistance Study</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --border: #d8d8d4;
+    --border-focus: #2563eb;
+    --text-primary: #111110;
+    --text-secondary: #5c5c58;
+    --text-muted: #9a9a94;
+    --accent: #2563eb;
+    --accent-light: #eff4ff;
+    --accent-hover: #1d4ed8;
+    --ai-bg: #f0f4ff;
+    --ai-border: #bfcfff;
+    --warn: #d97706;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --radius: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-size: 15px;
+    line-height: 1.65;
+    min-height: 100vh;
+    padding: 40px 16px 80px;
+  }
+
+  .shell {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  /* ── Header bar ── */
+  .study-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 36px;
+  }
+  .study-header .logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .progress-bar {
+    width: 140px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+
+  /* ── Page wrapper (one per stage) ── */
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── Typography ── */
+  h1 {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+  }
+  p { color: var(--text-primary); margin-bottom: 12px; }
+  .subtitle { color: var(--text-secondary); font-size: 14px; margin-bottom: 28px; }
+
+  /* ── Cards & panels ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .info-box {
+    background: var(--accent-light);
+    border: 1px solid var(--ai-border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+  .info-box p { color: #1e3a8a; margin-bottom: 0; font-size: 14px; }
+
+  /* ── Product brief ── */
+  .product-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .product-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+  }
+  .product-item .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 3px;
+  }
+  .product-item .value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  /* ── AI advice panel ── */
+  .ai-panel {
+    border: 1.5px solid var(--ai-border);
+    border-radius: var(--radius);
+    background: var(--ai-bg);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .ai-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 99px;
+  }
+  .ai-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: #7dd3fc;
+    border-radius: 50%;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  .ai-instruction {
+    font-size: 13px;
+    color: #1e3a8a;
+    margin-bottom: 16px;
+  }
+  .ai-instruction strong { color: #1e3a8a; }
+
+  .generate-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: 9px 20px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .generate-btn:hover:not(:disabled) { background: var(--accent-hover); }
+  .generate-btn:active:not(:disabled) { transform: scale(0.98); }
+  .generate-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .ai-suggestions { display: none; margin-top: 16px; }
+  .ai-suggestions.visible { display: block; animation: fadeIn 0.3s ease; }
+
+  .suggestion-item {
+    background: #fff;
+    border: 1px solid var(--ai-border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #1e3a8a;
+    position: relative;
+  }
+  .suggestion-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--accent);
+    margin-bottom: 5px;
+  }
+  .suggestion-item p { color: #1e3a8a; margin: 0; line-height: 1.55; }
+
+  .ai-disclaimer {
+    font-size: 12px;
+    color: #3b5bba;
+    margin-top: 12px;
+    font-style: italic;
+  }
+
+  .generating-indicator {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    color: var(--accent);
+    font-size: 13px;
+    margin-top: 14px;
+  }
+  .generating-indicator.visible { display: flex; }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--ai-border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Writing area ── */
+  .writing-section { margin-top: 20px; }
+  .writing-section label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.65;
+    padding: 14px 16px;
+    resize: vertical;
+    min-height: 180px;
+    outline: none;
+    transition: border-color 0.15s;
+    color: var(--text-primary);
+    background: var(--surface);
+  }
+  textarea:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
+  .word-counter {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-align: right;
+  }
+  .word-counter.warn { color: var(--warn); }
+  .word-counter.ok { color: var(--success); }
+
+  /* ── Likert scale ── */
+  .scale-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  .scale-table th {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    padding: 6px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .scale-table th:first-child { text-align: left; width: 46%; }
+  .scale-table td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .scale-table td:first-child {
+    text-align: left;
+    font-size: 14px;
+    padding-right: 20px;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+  .scale-table tr:last-child td { border-bottom: none; }
+  .scale-table tr:hover td { background: var(--bg); }
+
+  input[type="radio"] { accent-color: var(--accent); cursor: pointer; transform: scale(1.1); }
+
+  /* ── Multiple choice (comprehension) ── */
+  .mc-options { list-style: none; margin-top: 12px; }
+  .mc-options li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    font-size: 14px;
+  }
+  .mc-options li:hover { border-color: var(--accent); background: var(--accent-light); }
+  .mc-options li.selected { border-color: var(--accent); background: var(--accent-light); }
+  .mc-options li input { margin-top: 2px; flex-shrink: 0; }
+
+  /* ── Buttons ── */
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: 11px 28px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s, opacity 0.15s;
+    margin-top: 20px;
+    display: inline-block;
+  }
+  .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+  .btn-primary:active:not(:disabled) { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* ── Alerts ── */
+  .error-msg {
+    color: var(--danger);
+    font-size: 13px;
+    margin-top: 8px;
+    display: none;
+  }
+  .error-msg.visible { display: block; }
+
+  /* ── Condition label (for researcher view) ── */
+  .condition-tag {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    margin-bottom: 16px;
+  }
+  .condition-tag.diversity { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+  .condition-tag.accuracy { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+
+  /* ── Timer ── */
+  .timer-bar-wrap {
+    background: var(--border);
+    height: 3px;
+    border-radius: 99px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .timer-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 1s linear;
+  }
+  .timer-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+
+  /* ── Divider ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  /* ── Completion screen ── */
+  .completion-icon {
+    width: 56px; height: 56px;
+    background: #dcfce7;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    margin-bottom: 20px;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .product-grid { grid-template-columns: 1fr; }
+    .scale-table th, .scale-table td { padding: 6px 4px; font-size: 12px; }
+    h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ────────────────── HEADER ────────────────── -->
+  <header class="study-header">
+    <span class="logo">Creative AI Study &mdash; 2025</span>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <span id="progressLabel">Step 1 of 6</span>
+    </div>
+  </header>
+
+  <!-- ════════════════════════════════════════════
+       PAGE 1 · STUDY OVERVIEW
+  ════════════════════════════════════════════ -->
+  <div class="page active" id="page-overview">
+    <h1>Study Overview</h1>
+    <p class="subtitle">Please read carefully before proceeding.</p>
+
+    <div class="card">
+      <p><strong>Overview:</strong> This study consists of three parts and a short follow-up survey. In some parts, you will be asked understanding questions. You must answer these questions correctly in order to proceed.</p>
+      <p><strong>Task:</strong> You will be asked to write a short advertisement for a product. You may receive assistance from an AI tool, depending on your assigned condition.</p>
+      <p style="margin-bottom:0"><strong>Time:</strong> The study takes approximately 10–15 minutes to complete.</p>
+    </div>
+
+    <div class="card">
+      <h2>Understanding Question</h2>
+      <p>Which of the following best describes what you will be asked to do in this study?</p>
+      <ul class="mc-options" id="q-overview">
+        <li onclick="selectMC(this,'a')"><input type="radio" name="q1" value="a"> Write a short story about a product</li>
+        <li onclick="selectMC(this,'b')"><input type="radio" name="q1" value="b"> Write a short advertisement for a product, with possible AI assistance</li>
+        <li onclick="selectMC(this,'c')"><input type="radio" name="q1" value="c"> Evaluate advertisements written by other participants</li>
+      </ul>
+      <span class="error-msg" id="err-overview">Please select an answer before continuing.</span>
+    </div>
+
+    <button class="btn-primary" onclick="checkOverview()">Next →</button>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PAGE 2 · COGNITIVE UNCERTAINTY (MODERATOR)
+  ════════════════════════════════════════════ -->
+  <div class="page" id="page-uncertainty">
+    <h1>About You</h1>
+    <p class="subtitle">Please indicate how much you agree with each statement. There are no right or wrong answers.</p>
+
+    <div class="card">
+      <p style="font-size:13px; color:var(--text-secondary); margin-bottom:18px;">Scale: 1 = Strongly Disagree &nbsp;|&nbsp; 9 = Strongly Agree</p>
+      <table class="scale-table" id="uncertainty-table">
+        <thead>
+          <tr>
+            <th>Statement</th>
+            <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th>
+          </tr>
+        </thead>
+        <tbody id="uncertainty-body"></tbody>
+      </table>
+      <span class="error-msg" id="err-uncertainty">Please answer all questions before continuing.</span>
+    </div>
+
+    <button class="btn-primary" onclick="checkUncertainty()">Next →</button>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PAGE 3 · PRODUCT BRIEF
+  ════════════════════════════════════════════ -->
+  <div class="page" id="page-brief">
+    <h1>Part 1: Product Brief</h1>
+    <p class="subtitle">Please read the following product information carefully before proceeding to the writing task.</p>
+
+    <div class="info-box">
+      <p>You are a marketing specialist. Your task is to write a short advertisement (80–150 words) for the product described below. The ad should be suitable for use on social media or an e-commerce platform.</p>
+    </div>
+
+    <div class="card">
+      <h2>Product Information</h2>
+      <div class="product-grid">
+        <div class="product-item"><div class="label">Product Name</div><div class="value">AuraShield iPhone Case</div></div>
+        <div class="product-item"><div class="label">Compatible With</div><div class="value">iPhone 15 / 15 Pro / 15 Pro Max</div></div>
+        <div class="product-item"><div class="label">Material</div><div class="value">Military-grade polycarbonate + soft TPU lining</div></div>
+        <div class="product-item"><div class="label">Colors Available</div><div class="value">Midnight Black, Frost White, Sage Green, Deep Navy</div></div>
+        <div class="product-item"><div class="label">Key Features</div><div class="value">Drop protection (12 ft), MagSafe compatible, slim profile (1.2 mm)</div></div>
+        <div class="product-item"><div class="label">Price</div><div class="value">¥199 RMB (approx. $28 USD)</div></div>
+        <div class="product-item"><div class="label">Target Audience</div><div class="value">Young urban professionals, aged 22–35</div></div>
+        <div class="product-item"><div class="label">Brand Tone</div><div class="value">Modern, confident, minimalist</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Understanding Question</h2>
+      <p>What is the primary task you will complete in this study?</p>
+      <ul class="mc-options" id="q-brief">
+        <li onclick="selectMC(this,'a')"><input type="radio" name="q2" value="a"> Evaluate the quality of an existing advertisement</li>
+        <li onclick="selectMC(this,'b')"><input type="radio" name="q2" value="b"> Write a short advertisement for the AuraShield iPhone case</li>
+        <li onclick="selectMC(this,'c')"><input type="radio" name="q2" value="c"> Design a new product based on market research</li>
+      </ul>
+      <span class="error-msg" id="err-brief">Please select the correct answer before continuing.</span>
+    </div>
+
+    <button class="btn-primary" onclick="checkBrief()">Next →</button>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PAGE 4 · WRITING TASK (CONDITION-SPECIFIC)
+  ════════════════════════════════════════════ -->
+  <div class="page" id="page-task">
+    <h1>Part 2: Writing Task</h1>
+    <p class="subtitle">Please write your advertisement in the space provided below.</p>
+
+    <!-- Condition tag — visible only in researcher/debug mode; hide in deployment -->
+    <div id="condition-display"></div>
+
+    <!-- AI Advice Panel -->
+    <div class="ai-panel" id="ai-panel">
+      <div class="ai-panel-header">
+        <span class="ai-badge">AI Assistant</span>
+        <span style="font-size:13px; color:var(--text-secondary);">Optional assistance available</span>
+      </div>
+      <p class="ai-instruction" id="ai-instruction-text">
+        To assist you, we have provided you with <strong>access to AI assistance</strong>. If you wish, click the button below to receive AI-generated suggestions as a starting point for your advertisement. You are <strong>free to use or disregard any element</strong> of the AI assistant's suggestions, or start entirely with your own idea.
+      </p>
+
+      <!-- Timer bar (shown after generating) -->
+      <div id="timer-section" style="display:none;">
+        <p class="timer-label" id="timer-label">Please take a moment to review the suggestions before writing.</p>
+        <div class="timer-bar-wrap"><div class="timer-bar-fill" id="timerFill" style="width:100%"></div></div>
+      </div>
+
+      <button class="generate-btn" id="generateBtn" onclick="generateSuggestions()">
+        ✦ Get AI Suggestions
+      </button>
+
+      <div class="generating-indicator" id="generatingIndicator">
+        <div class="spinner"></div>
+        <span>Generating suggestions&hellip;</span>
+      </div>
+
+      <div class="ai-suggestions" id="aiSuggestions">
+        <div id="suggestionsList"></div>
+        <p class="ai-disclaimer">★ These suggestions were generated by an AI assistant. You are free to use, adapt, or ignore them entirely.</p>
+      </div>
+    </div>
+
+    <!-- Writing area -->
+    <div class="writing-section">
+      <label for="adTextarea">Please write your advertisement (80–150 words) here:</label>
+      <textarea id="adTextarea" placeholder="Start writing your advertisement here…" oninput="updateWordCount()"></textarea>
+      <div class="word-counter" id="wordCounter">Word count: 0 / 80 minimum</div>
+    </div>
+
+    <span class="error-msg" id="err-task">Please write at least 80 words before continuing.</span>
+    <br>
+    <button class="btn-primary" id="taskNextBtn" onclick="checkTask()">Submit Advertisement →</button>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PAGE 5 · POST-TASK SURVEY
+  ════════════════════════════════════════════ -->
+  <div class="page" id="page-survey">
+    <h1>Follow-Up Survey</h1>
+    <p class="subtitle">Please answer the following questions about your experience writing the advertisement.</p>
+
+    <!-- Show submitted ad -->
+    <div class="card" id="submitted-ad-display" style="background:var(--bg);">
+      <h3>Your Submitted Advertisement</h3>
+      <p id="submitted-ad-text" style="font-style:italic; color:var(--text-secondary); margin:0; font-size:14px;"></p>
+    </div>
+
+    <!-- Manipulation Check -->
+    <div class="card">
+      <h2>Section 1: About the AI Suggestions</h2>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:18px;">Scale: 1 = Not at all &nbsp;|&nbsp; 9 = Extremely</p>
+      <table class="scale-table">
+        <thead>
+          <tr><th>Statement</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th></tr>
+        </thead>
+        <tbody id="manipulation-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Deep Thinking / Critical Thinking (Mediator 1) -->
+    <div class="card">
+      <h2>Section 2: Your Thinking Process</h2>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:18px;">Scale: 1 = Not at all &nbsp;|&nbsp; 9 = Extremely</p>
+      <table class="scale-table">
+        <thead>
+          <tr><th>Statement</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th></tr>
+        </thead>
+        <tbody id="deepthinking-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Automation Bias (Mediator 2) -->
+    <div class="card">
+      <h2>Section 3: Your Use of the AI Suggestions</h2>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:18px;">Scale: 1 = Not at all &nbsp;|&nbsp; 9 = Extremely</p>
+      <table class="scale-table">
+        <thead>
+          <tr><th>Statement</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th></tr>
+        </thead>
+        <tbody id="automation-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Self-rated creativity -->
+    <div class="card">
+      <h2>Section 4: Your Advertisement</h2>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:18px;">Scale: 1 = Not at all &nbsp;|&nbsp; 9 = Extremely</p>
+      <table class="scale-table">
+        <thead>
+          <tr><th>Statement</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th></tr>
+        </thead>
+        <tbody id="creativity-body"></tbody>
+      </table>
+    </div>
+
+    <span class="error-msg" id="err-survey">Please complete all questions before continuing.</span>
+    <button class="btn-primary" onclick="checkSurvey()">Next →</button>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PAGE 6 · DEMOGRAPHICS
+  ════════════════════════════════════════════ -->
+  <div class="page" id="page-demographics">
+    <h1>Demographics</h1>
+    <p class="subtitle">Finally, please answer a few questions about yourself.</p>
+
+    <div class="card">
+      <p style="font-weight:500; margin-bottom:14px;">What gender do you identify with?</p>
+      <ul class="mc-options" id="q-gender">
+        <li onclick="selectMC(this,'male')"><input type="radio" name="gender" value="male"> Male</li>
+        <li onclick="selectMC(this,'female')"><input type="radio" name="gender" value="female"> Female</li>
+        <li onclick="selectMC(this,'other')"><input type="radio" name="gender" value="other"> Other / Prefer not to say</li>
+      </ul>
+
+      <hr class="divider" />
+
+      <p style="font-weight:500; margin-bottom:10px;">What is your current age?</p>
+      <input type="number" id="age-input" min="16" max="99" placeholder="Enter your age"
+        style="border:1.5px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-family:inherit;font-size:14px;width:160px;outline:none;" />
+
+      <hr class="divider" />
+
+      <p style="font-weight:500; margin-bottom:14px;">What is your highest level of education?</p>
+      <ul class="mc-options" id="q-edu">
+        <li onclick="selectMC(this,'highschool')"><input type="radio" name="edu" value="highschool"> High school or below</li>
+        <li onclick="selectMC(this,'bachelor')"><input type="radio" name="edu" value="bachelor"> Bachelor's degree</li>
+        <li onclick="selectMC(this,'master')"><input type="radio" name="edu" value="master"> Master's degree</li>
+        <li onclick="selectMC(this,'phd')"><input type="radio" name="edu" value="phd"> Doctoral degree (PhD or equivalent)</li>
+      </ul>
+
+      <hr class="divider" />
+
+      <p style="font-weight:500; margin-bottom:14px;">Have you previously used AI writing or creative tools (e.g., ChatGPT, Kimi, Wenxin Yiyan)?</p>
+      <ul class="mc-options" id="q-aiexp">
+        <li onclick="selectMC(this,'never')"><input type="radio" name="aiexp" value="never"> Never</li>
+        <li onclick="selectMC(this,'rarely')"><input type="radio" name="aiexp" value="rarely"> Rarely (a few times)</li>
+        <li onclick="selectMC(this,'sometimes')"><input type="radio" name="aiexp" value="sometimes"> Sometimes (monthly)</li>
+        <li onclick="selectMC(this,'often')"><input type="radio" name="aiexp" value="often"> Often (weekly or more)</li>
+      </ul>
+
+      <hr class="divider" />
+
+      <p style="font-weight:500; margin-bottom:8px;">Do you have any additional comments about this study?</p>
+      <textarea id="comments" placeholder="Optional…" style="min-height:90px;"></textarea>
+    </div>
+
+    <span class="error-msg" id="err-demographics">Please complete all required fields before continuing.</span>
+    <button class="btn-primary" onclick="checkDemographics()">Submit Study →</button>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PAGE 7 · COMPLETION
+  ════════════════════════════════════════════ -->
+  <div class="page" id="page-complete">
+    <div class="completion-icon">✓</div>
+    <h1>Thank You!</h1>
+    <p class="subtitle">You have successfully completed the study.</p>
+    <div class="card">
+      <p>Your responses have been recorded. Please copy the completion code below and paste it back into the Credamo platform to receive your payment.</p>
+      <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-top:14px;text-align:center;">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;letter-spacing:0.15em;color:var(--accent);" id="completionCode">XXXX-XXXX</span>
+      </div>
+    </div>
+    <div class="card" style="background:var(--accent-light);border-color:var(--ai-border);">
+      <p style="font-size:13px;color:#1e3a8a;margin:0;">Thank you for your participation. Your data will be used solely for academic research purposes and will remain strictly confidential. If you have any questions, please contact the research team.</p>
+    </div>
+    <div id="data-output" style="margin-top:30px;"></div>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+/* ════════════════════════════════════════
+   STUDY CONFIG
+════════════════════════════════════════ */
+const CONDITIONS = ['diversity','accuracy'];
+const condition = CONDITIONS[Math.floor(Math.random() * 2)];
+// To force a condition for testing, uncomment one of the lines below:
+// const condition = 'diversity';
+// const condition = 'accuracy';
+
+let suggestionsGenerated = false;
+let suggestionsViewed    = false;
+let currentPage = 0;
+const PAGES = ['overview','uncertainty','brief','task','survey','demographics','complete'];
+const TOTAL  = PAGES.length;
+
+/* ════════════════════════════════════════
+   SCALE ITEMS
+════════════════════════════════════════ */
+const uncertaintyItems = [
+  { id:'cu1', text:'I am not very confident about what makes a good advertisement.' },
+  { id:'cu2', text:'When writing marketing content, I often feel unsure about what approach to take.' },
+  { id:'cu3', text:'I find it difficult to judge whether my creative ideas are effective.' },
+  { id:'cu4', text:'I am uncertain about how to appeal to the target audience in advertising.' },
+];
+
+const manipulationItems = [
+  { id:'mc1', text:'The AI suggestions I received were varied and offered many different creative approaches.' },
+  { id:'mc2', text:'The AI suggestions I received were precise and well-grounded in the product\'s actual features.' },
+  { id:'mc3', text:'The AI suggestions I received covered a broad range of distinct advertising angles.' },
+  { id:'mc4', text:'The AI suggestions I received were factually accurate and reliable.' },
+];
+
+const deepThinkingItems = [
+  { id:'dt1', text:'I carefully evaluated each AI suggestion before deciding whether to use it.' },
+  { id:'dt2', text:'I thought critically about how each suggestion could improve my advertisement.' },
+  { id:'dt3', text:'I compared the AI suggestions against my own ideas before writing.' },
+  { id:'dt4', text:'I reflected deeply on what kind of advertisement would be most effective.' },
+];
+
+const automationBiasItems = [
+  { id:'ab1', text:'I followed the AI\'s suggestions without questioning them.' },
+  { id:'ab2', text:'I would have written a very different advertisement without the AI\'s help.' },
+  { id:'ab3', text:'I relied heavily on the AI suggestions when writing my advertisement.' },
+  { id:'ab4', text:'I accepted the AI\'s suggestions because they seemed more reliable than my own ideas.' },
+];
+
+const creativityItems = [
+  { id:'cr1', text:'How novel do you think your advertisement is?' },
+  { id:'cr2', text:'How original do you think your advertisement is?' },
+  { id:'cr3', text:'How unusual do you think your advertisement is compared to typical ads for this type of product?' },
+  { id:'cr4', text:'How appropriate do you think your advertisement is for the target audience?' },
+  { id:'cr5', text:'How effective do you think your advertisement would be if published?' },
+];
+
+/* ════════════════════════════════════════
+   AI SUGGESTIONS (PRE-SCRIPTED)
+════════════════════════════════════════ */
+const suggestions = {
+  diversity: [
+    {
+      label: 'Suggestion 1 — Emotional Storytelling',
+      text: 'Picture this: you\'re rushing through the morning commute, coffee in one hand, phone in the other — and it slips. With AuraShield, the story doesn\'t end there. Military-grade protection meets paper-thin elegance, so you can live boldly without second-guessing every moment. Because your iPhone deserves more than luck.'
+    },
+    {
+      label: 'Suggestion 2 — Bold & Provocative',
+      text: 'Most phone cases are forgettable. AuraShield isn\'t. Built for the drop you didn\'t see coming, the meeting you can\'t miss, the day that refuses to slow down — this is protection that doesn\'t compromise on style. Four colorways. Zero excuses.'
+    },
+    {
+      label: 'Suggestion 3 — Minimalist & Product-Focused',
+      text: 'Slim. Strong. Seamless. The AuraShield case for iPhone 15 is everything you need — and nothing you don\'t. MagSafe ready. Drop-tested to 12 feet. Just 1.2mm thin. Some things really can do it all.'
+    },
+  ],
+  accuracy: [
+    {
+      label: 'Suggestion 1 — Feature Highlight',
+      text: 'The AuraShield iPhone 15 case combines military-grade polycarbonate with a soft TPU inner lining to deliver certified drop protection up to 12 feet. At just 1.2mm thin, it preserves your phone\'s slim profile while maintaining full MagSafe compatibility. Available in Midnight Black, Frost White, Sage Green, and Deep Navy.'
+    },
+    {
+      label: 'Suggestion 2 — Value Proposition',
+      text: 'Engineered for everyday demands, AuraShield offers 12-foot drop protection and MagSafe support for the iPhone 15, 15 Pro, and 15 Pro Max — all at ¥199 RMB. The dual-layer polycarbonate and TPU construction ensures reliable protection without adding unnecessary bulk to your device.'
+    },
+    {
+      label: 'Suggestion 3 — Audience-Targeted',
+      text: 'For professionals who rely on their iPhone throughout the day, AuraShield delivers the protection your device needs and the minimal design your aesthetic demands. Fully MagSafe compatible, tested to 12 feet, and available in four refined colorways — the AuraShield case is precision-engineered for the iPhone 15 series.'
+    },
+  ]
+};
+
+/* ════════════════════════════════════════
+   RENDER SCALE TABLES
+════════════════════════════════════════ */
+function renderTable(tbodyId, items) {
+  const tbody = document.getElementById(tbodyId);
+  items.forEach(item => {
+    const tr = document.createElement('tr');
+    let tds = `<td>${item.text}</td>`;
+    for (let v = 1; v <= 9; v++) {
+      tds += `<td><input type="radio" name="${item.id}" value="${v}"></td>`;
+    }
+    tr.innerHTML = tds;
+    tbody.appendChild(tr);
+  });
+}
+
+function allAnswered(items) {
+  return items.every(item => document.querySelector(`input[name="${item.id}"]:checked`));
+}
+
+/* ════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════ */
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const idx = PAGES.indexOf(name);
+  currentPage = idx;
+  const pct = Math.round(((idx) / (TOTAL - 1)) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `Step ${idx + 1} of ${TOTAL}`;
+}
+
+/* ════════════════════════════════════════
+   MC HELPERS
+════════════════════════════════════════ */
+function selectMC(el, val) {
+  const name = el.querySelector('input').name;
+  el.closest('ul').querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+  el.classList.add('selected');
+  el.querySelector('input').checked = true;
+}
+function getMC(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : null;
+}
+
+/* ════════════════════════════════════════
+   PAGE CHECKS
+════════════════════════════════════════ */
+function checkOverview() {
+  const err = document.getElementById('err-overview');
+  if (!getMC('q1')) { err.classList.add('visible'); return; }
+  if (getMC('q1') !== 'b') {
+    err.textContent = 'That answer is incorrect. Please re-read the overview and try again.';
+    err.classList.add('visible');
+    document.getElementById('q-overview').querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+    document.querySelectorAll('input[name="q1"]').forEach(r => r.checked = false);
+    return;
+  }
+  err.classList.remove('visible');
+  showPage('uncertainty');
+}
+
+function checkUncertainty() {
+  const err = document.getElementById('err-uncertainty');
+  if (!allAnswered(uncertaintyItems)) { err.classList.add('visible'); return; }
+  err.classList.remove('visible');
+  showPage('brief');
+}
+
+function checkBrief() {
+  const err = document.getElementById('err-brief');
+  if (!getMC('q2')) { err.classList.add('visible'); return; }
+  if (getMC('q2') !== 'b') {
+    err.textContent = 'That answer is incorrect. Please re-read the product brief and try again.';
+    err.classList.add('visible');
+    document.getElementById('q-brief').querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+    document.querySelectorAll('input[name="q2"]').forEach(r => r.checked = false);
+    return;
+  }
+  err.classList.remove('visible');
+  // Set condition display
+  const cd = document.getElementById('condition-display');
+  cd.innerHTML = `<span class="condition-tag ${condition}">${condition === 'diversity' ? '◈ Diversity Condition' : '◉ Accuracy Condition'}</span>`;
+  showPage('task');
+}
+
+function checkTask() {
+  const err = document.getElementById('err-task');
+  const wc  = wordCount(document.getElementById('adTextarea').value);
+  if (wc < 80) {
+    err.textContent = `Your advertisement is ${wc} words. Please write at least 80 words.`;
+    err.classList.add('visible'); return;
+  }
+  err.classList.remove('visible');
+  // Store ad text and show in survey
+  document.getElementById('submitted-ad-text').textContent = document.getElementById('adTextarea').value.trim();
+  showPage('survey');
+}
+
+function checkSurvey() {
+  const allItems = [...manipulationItems, ...deepThinkingItems, ...automationBiasItems, ...creativityItems];
+  const err = document.getElementById('err-survey');
+  if (!allAnswered(allItems)) { err.classList.add('visible'); return; }
+  err.classList.remove('visible');
+  showPage('demographics');
+}
+
+function checkDemographics() {
+  const err = document.getElementById('err-demographics');
+  const age = document.getElementById('age-input').value;
+  if (!getMC('gender') || !age || !getMC('edu') || !getMC('aiexp')) {
+    err.classList.add('visible'); return;
+  }
+  err.classList.remove('visible');
+  finalizeStudy();
+}
+
+/* ════════════════════════════════════════
+   AI SUGGESTIONS GENERATION
+════════════════════════════════════════ */
+function generateSuggestions() {
+  if (suggestionsGenerated) return;
+  const btn = document.getElementById('generateBtn');
+  const ind = document.getElementById('generatingIndicator');
+  btn.disabled = true;
+  ind.classList.add('visible');
+
+  // Simulate API delay (2–3 seconds)
+  const delay = 2000 + Math.random() * 1000;
+  setTimeout(() => {
+    ind.classList.remove('visible');
+    renderSuggestions();
+    suggestionsGenerated = true;
+    startTimer();
+  }, delay);
+}
+
+function renderSuggestions() {
+  const list = document.getElementById('suggestionsList');
+  list.innerHTML = '';
+  suggestions[condition].forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'suggestion-item';
+    div.innerHTML = `<div class="suggestion-label">${s.label}</div><p>${s.text}</p>`;
+    list.appendChild(div);
+  });
+  document.getElementById('aiSuggestions').classList.add('visible');
+  document.getElementById('generateBtn').textContent = '✓ Suggestions Generated';
+}
+
+function startTimer() {
+  const sec = document.getElementById('timer-section');
+  const fill = document.getElementById('timerFill');
+  sec.style.display = 'block';
+  const DURATION = 60; // seconds participants see suggestions before writing
+  let remaining = DURATION;
+  fill.style.width = '100%';
+  const interval = setInterval(() => {
+    remaining--;
+    fill.style.width = (remaining / DURATION * 100) + '%';
+    if (remaining <= 10) {
+      document.getElementById('timer-label').textContent = `You may begin writing now (${remaining}s).`;
+    }
+    if (remaining <= 0) {
+      clearInterval(interval);
+      document.getElementById('timer-label').textContent = 'You may now write your advertisement below.';
+    }
+  }, 1000);
+  suggestionsViewed = true;
+}
+
+/* ════════════════════════════════════════
+   WORD COUNTER
+════════════════════════════════════════ */
+function wordCount(text) {
+  return text.trim().split(/\s+/).filter(w => w.length > 0).length;
+}
+function updateWordCount() {
+  const wc = wordCount(document.getElementById('adTextarea').value);
+  const el = document.getElementById('wordCounter');
+  if (wc < 80) {
+    el.textContent = `Word count: ${wc} / 80 minimum`;
+    el.className = 'word-counter warn';
+  } else if (wc > 150) {
+    el.textContent = `Word count: ${wc} / 150 maximum (please trim)`;
+    el.className = 'word-counter warn';
+  } else {
+    el.textContent = `Word count: ${wc} ✓`;
+    el.className = 'word-counter ok';
+  }
+}
+
+/* ════════════════════════════════════════
+   DATA COLLECTION & COMPLETION
+════════════════════════════════════════ */
+function collectData() {
+  const getData = (items) => {
+    const out = {};
+    items.forEach(i => {
+      const el = document.querySelector(`input[name="${i.id}"]:checked`);
+      out[i.id] = el ? parseInt(el.value) : null;
+    });
+    return out;
+  };
+  return {
+    condition,
+    timestamp: new Date().toISOString(),
+    suggestionsGenerated,
+    adText: document.getElementById('adTextarea').value.trim(),
+    wordCount: wordCount(document.getElementById('adTextarea').value),
+    uncertainty: getData(uncertaintyItems),
+    manipulation: getData(manipulationItems),
+    deepThinking: getData(deepThinkingItems),
+    automationBias: getData(automationBiasItems),
+    selfCreativity: getData(creativityItems),
+    demographics: {
+      gender: getMC('gender'),
+      age: document.getElementById('age-input').value,
+      education: getMC('edu'),
+      aiExperience: getMC('aiexp'),
+      comments: document.getElementById('comments').value.trim(),
+    }
+  };
+}
+
+async function finalizeStudy() {
+  const data = collectData();
+  const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzaELHLpJpmvEZJhc5zO5sR_bvHh2XEnFqOHfCIXu0LyvCsYsyBa6Tawfdj_kmjBTHJmw/exec';
+
+  try {
+    // Google Apps Script /exec redirects POST → GET internally, so data sent
+    // via POST body is lost. The reliable workaround is to encode all data as
+    // a single URL parameter and send a GET request instead.
+    const encoded = encodeURIComponent(JSON.stringify(data));
+    await fetch(SHEET_URL + '?payload=' + encoded, {
+      method: 'GET',
+      mode:   'no-cors'
+    });
+  } catch (err) {
+    // Log silently — never block a participant due to a network error
+    console.error('Submission error:', err);
+  }
+
+  // Generate and display completion code regardless of submission outcome
+  const code = 'CR'
+    + Math.random().toString(36).substring(2,6).toUpperCase()
+    + '-'
+    + Math.random().toString(36).substring(2,6).toUpperCase();
+  document.getElementById('completionCode').textContent = code;
+  showPage('complete');
+}
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  renderTable('uncertainty-body',  uncertaintyItems);
+  renderTable('manipulation-body', manipulationItems);
+  renderTable('deepthinking-body', deepThinkingItems);
+  renderTable('automation-body',   automationBiasItems);
+  renderTable('creativity-body',   creativityItems);
+
+  // Set condition-specific AI instruction text
+  const instrMap = {
+    diversity: 'To assist you, we have provided you with <strong>access to AI assistance</strong>. If you wish, click the button below to receive AI-generated suggestions covering <strong>a diverse range of creative advertising approaches</strong>. You are <strong>free to use or disregard any element</strong> of the AI suggestions, or start entirely with your own idea.',
+    accuracy:  'To assist you, we have provided you with <strong>access to AI assistance</strong>. If you wish, click the button below to receive AI-generated suggestions that are <strong>factually precise and grounded in the product\'s actual specifications</strong>. You are <strong>free to use or disregard any element</strong> of the AI suggestions, or start entirely with your own idea.',
+  };
+  document.getElementById('ai-instruction-text').innerHTML = instrMap[condition];
+});
+</script>
+</body>
+</html>
